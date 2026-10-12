@@ -1,0 +1,90 @@
+  GNU nano 8.7.1                                                                       assets/style.css                                                                                
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f5f9;
+    color: #172033;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+.card {
+    width: 100%;
+    max-width: 440px;
+    padding: 32px;
+    background: white;
+    border: 1px solid #e1e5ec;
+    border-radius: 16px;
+    box-shadow: 0 12px 36px rgba(25, 35, 55, .07);
+}
+
+h1 {
+    margin-top: 0;
+    font-size: 28px;
+}
+
+.muted {
+    color: #657087;
+    line-height: 1.6;
+}
+
+label {
+    display: block;
+    margin: 20px 0 8px;
+    font-weight: 600;
+}
+input {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd2df;
+    border-radius: 8px;
+    font: inherit;
+}
+
+input:focus {
+    outline: 2px solid #7c9cff;
+    outline-offset: 2px;
+}
+
+button {
+    width: 100%;
+    margin-top: 24px;
+    padding: 13px;
+    border: 0;
+    border-radius: 8px;
+    background: #254fc7;
+    color: white;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.secondary {
+    background: #e9edf5;
+    color: #172033;
+}
+
+.error {
+    padding: 12px;
+    border-radius: 8px;
+    background: #fff0f0;
+    color: #a51f1f;
+}
+
+nav {
+    display: grid;
+    gap: 12px;
+    margin: 24px 0;
+}
+
+nav a {
+    color: #254fc7;
+}
