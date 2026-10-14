@@ -5,7 +5,7 @@ declare(strict_types=1);
 $host = 'localhost';
 $dbname = 'compte';
 $username = 'compte_app';
-$password = '3]?_o>W&ArRbw0q]xt-GIl*Osly(+"jrH[Lo6?Z_';
+$password = 'xxx';
 
 $dsn = "mysql:host={$host};dbname={$dbname};charset=utf8mb4";
 
