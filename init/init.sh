@@ -27,6 +27,10 @@ SITE_GROUP="$SITE_NAME"
 DEPLOY_HELPER="/usr/local/sbin/deploy-${SITE_NAME}"
 SUDOERS_FILE="/etc/sudoers.d/deploy-${SITE_NAME}"
 DEPLOY_PAGE="$SITE_DIR/public/deploy.php"
+DEPLOY_SOCKET="/run/deploy-${SITE_NAME}.sock"
+DEPLOY_WORKER="/usr/local/sbin/deploy-${SITE_NAME}-worker"
+SOCKET_UNIT="deploy-${SITE_NAME}.socket"
+SERVICE_UNIT="deploy-${SITE_NAME}@.service"
 
 echo "== Initialisation du site : $SITE_NAME =="
 echo "Domaine : $DOMAIN"
@@ -42,6 +46,13 @@ command -v git >/dev/null || {
     echo "Erreur : Git n'est pas installé."
     exit 1
 }
+
+for required_command in systemctl timeout flock; do
+    command -v "$required_command" >/dev/null || {
+        echo "Erreur : commande absente : $required_command"
+        exit 1
+    }
+done
 
 [[ -d "$SITE_DIR/.git" ]] || {
     echo "Erreur : aucun dépôt Git trouvé dans $SITE_DIR"
@@ -65,6 +76,12 @@ if ! id "$DEPLOY_USER" >/dev/null 2>&1; then
         --create-home \
         --shell /usr/sbin/nologin \
         "$DEPLOY_USER"
+fi
+
+DEPLOY_HOME="$(getent passwd "$DEPLOY_USER" | cut -d: -f6)"
+if [[ -z "$DEPLOY_HOME" || ! -d "$DEPLOY_HOME" ]]; then
+    echo "Erreur : répertoire personnel absent pour $DEPLOY_USER."
+    exit 1
 fi
 
 # Apache doit pouvoir lire les fichiers du site
@@ -109,37 +126,115 @@ EOF
 chown root:root "$DEPLOY_HELPER"
 chmod 0755 "$DEPLOY_HELPER"
 
-# Autorisation sudo limitée à cette seule commande
-cat > "$SUDOERS_FILE" <<EOF
-www-data ALL=($DEPLOY_USER) NOPASSWD: $DEPLOY_HELPER
+# Le protocole renvoie le code de sortie, puis la sortie du déploiement.
+cat > "$DEPLOY_WORKER" <<EOF
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+status=0
+output=\$(/usr/bin/timeout 90 /usr/bin/flock -n -E 75 "\$HOME/.deploy.lock" '$DEPLOY_HELPER' </dev/null 2>&1) || status=\$?
+if [[ \$status -eq 75 ]]; then
+    output="Un deploiement est deja en cours."
+elif [[ \$status -eq 124 ]]; then
+    output="Delai de deploiement depasse (90 secondes). \$output"
+fi
+printf '%s\n%s\n' "\$status" "\$output"
 EOF
 
-chown root:root "$SUDOERS_FILE"
-chmod 0440 "$SUDOERS_FILE"
+chown root:root "$DEPLOY_WORKER"
+chmod 0755 "$DEPLOY_WORKER"
 
-if ! visudo -cf "$SUDOERS_FILE"; then
-    echo "Erreur dans la configuration sudoers."
-    rm -f "$SUDOERS_FILE"
-    exit 1
-fi
+cat > "/etc/systemd/system/$SOCKET_UNIT" <<EOF
+[Unit]
+Description=Socket de deploiement $SITE_NAME
+
+[Socket]
+ListenStream=$DEPLOY_SOCKET
+SocketUser=$DEPLOY_USER
+SocketGroup=www-data
+SocketMode=0660
+Accept=yes
+RemoveOnStop=yes
+
+[Install]
+WantedBy=sockets.target
+EOF
+
+cat > "/etc/systemd/system/$SERVICE_UNIT" <<EOF
+[Unit]
+Description=Deploiement $SITE_NAME
+
+[Service]
+User=$DEPLOY_USER
+Group=$SITE_GROUP
+Environment="HOME=$DEPLOY_HOME"
+Environment=GIT_TERMINAL_PROMPT=0
+ExecStart=$DEPLOY_WORKER
+StandardInput=socket
+StandardOutput=inherit
+StandardError=journal
+RuntimeMaxSec=95
+NoNewPrivileges=yes
+EOF
+
+chown root:root "/etc/systemd/system/$SOCKET_UNIT" "/etc/systemd/system/$SERVICE_UNIT"
+chmod 0644 "/etc/systemd/system/$SOCKET_UNIT" "/etc/systemd/system/$SERVICE_UNIT"
+systemctl daemon-reload
+systemctl enable "$SOCKET_UNIT"
+systemctl restart "$SOCKET_UNIT"
+systemctl is-active --quiet "$SOCKET_UNIT"
+
+# Supprimer l'ancienne autorisation : PHP n'utilise plus sudo.
+rm -f "$SUDOERS_FILE"
 
 # Génération de la page avec l'utilisateur propre à ce site
 cat > "$DEPLOY_PAGE" <<EOF
 <?php
-\$output = [];
-\$returnCode = 0;
+\$socketPath = '$DEPLOY_SOCKET';
+EOF
+cat >> "$DEPLOY_PAGE" <<'EOF'
 
-exec(
-    'sudo -n -H -u $DEPLOY_USER $DEPLOY_HELPER 2>&1',
-    \$output,
-    \$returnCode
-);
+header('Content-Type: text/plain; charset=utf-8');
 
-echo implode("\n", \$output);
-
-if (\$returnCode !== 0) {
-    error_log('Échec du déploiement Git : ' . implode("\n", \$output));
+$socket = @stream_socket_client('unix://' . $socketPath, $errorCode, $errorMessage, 5);
+if ($socket === false) {
+    http_response_code(503);
+    error_log('Connexion au service de deploiement impossible : ' . $errorMessage);
+    exit("Service de deploiement indisponible.\n");
 }
+
+if (!stream_set_timeout($socket, 100)) {
+    fclose($socket);
+    http_response_code(500);
+    error_log('Impossible de configurer le delai du socket de deploiement.');
+    exit("Erreur de configuration du deploiement.\n");
+}
+
+$response = stream_get_contents($socket);
+$metadata = stream_get_meta_data($socket);
+fclose($socket);
+
+if ($response === false || $metadata['timed_out'] || !$metadata['eof']) {
+    http_response_code(504);
+    error_log('Reponse du service de deploiement incomplete ou hors delai.');
+    exit("Reponse du service de deploiement incomplete ou hors delai.\n");
+}
+
+$parts = explode("\n", $response, 2);
+if (count($parts) !== 2 || !ctype_digit($parts[0]) || (int) $parts[0] > 255) {
+    http_response_code(502);
+    error_log('Reponse du service de deploiement invalide.');
+    exit("Reponse du service de deploiement invalide.\n");
+}
+
+$returnCode = (int) $parts[0];
+$output = $parts[1];
+if ($returnCode !== 0) {
+    http_response_code($returnCode === 75 ? 409 : ($returnCode === 124 ? 504 : 500));
+    error_log('Echec du deploiement Git : ' . $output);
+}
+
+echo $output;
 EOF
 
 chown "$DEPLOY_USER:$SITE_GROUP" "$DEPLOY_PAGE"
@@ -161,5 +256,5 @@ echo "Site Apache : $APACHE_CONF"
 echo "Dépôt Git : $SITE_DIR"
 echo "Utilisateur de déploiement : $DEPLOY_USER"
 echo
-echo "Commande de déploiement autorisée :"
-echo "sudo -n -H -u $DEPLOY_USER $DEPLOY_HELPER"
+echo "Socket de déploiement : $DEPLOY_SOCKET"
+echo "État du service : systemctl status $SOCKET_UNIT"
