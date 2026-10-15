@@ -29,7 +29,7 @@ putenv('GIT_CONFIG_GLOBAL=' . $gitConfigPath);
 putenv('GIT_TERMINAL_PROMPT=0');
 
 // Repo
-$repoUrl = "https://github.com/antoineg44/video.git"; // Remplacez par l'URL de votre dépôt
+$repoUrl = "https://github.com/antoineg44/compte.git"; // Remplacez par l'URL de votre dépôt
 
 // Fonction utilitaire pour exécuter une commande shell
 function runCommand($command, &$output = null, &$returnVar = null) {
