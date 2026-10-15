@@ -92,8 +92,7 @@ try {
     http_response_code(500);
 
     exit(
-        'Impossible de charger le tableau de bord. '        . 'Consulte les journaux du serveur pour plus de détails.
-'
+        'Impossible de charger le tableau de bord. '.'Consulte les journaux du serveur pour plus de détails.'
     );
 }
 
@@ -677,8 +676,7 @@ function libelleActivite(string $action): string
             <?= $comptesAujourdhui ?>
         </div>
 
-        <div class="statistique-description">            Inscription(s) depuis minuit, selon l'heure du serveu
-r MySQL.
+        <div class="statistique-description">            Inscription(s) depuis minuit, selon l'heure du serveur MySQL.
         </div>
 
     </section>
@@ -733,8 +731,7 @@ r MySQL.
                     </thead>
 
                     <tbody>
-                    <?php foreach ($derniersUtilisateurs as $util
-isateur): ?>
+                    <?php foreach ($derniersUtilisateurs as $utilisateur): ?>
 
                         <tr>
 
@@ -742,21 +739,17 @@ isateur): ?>
                                 <?= (int) $utilisateur['id'] ?>
                             </td>
 
-                            <td>                                <?= e((string) $utilisateur['iden
-tifiant']) ?>
+                            <td>                                <?= e((string) $utilisateur['identifiant']) ?>
                             </td>
 
-                            <td>                                <?= e((string) $utilisateur['emai
-l']) ?>
+                            <td>                                <?= e((string) $utilisateur['email']) ?>
                             </td>
 
                             <td>
 
-                                <span class="badge <?= e(                                    classeRole((string) $utilisat
-eur['role'])
+                                <span class="badge <?= e(                                  classeRole((string) $utilisateur['role'])
                                 ) ?>">
-                                    <?= e(                                        libelleRole((string) $uti
-lisateur['role'])
+                                    <?= e(                                        libelleRole((string) $utilisateur['role'])
                                     ) ?>
                                 </span>
 
@@ -764,8 +757,7 @@ lisateur['role'])
 
                             <td>
                                 <?= e(
-                                    formaterDate(                                        (string) $utilisateur['da
-te_creation']
+                                    formaterDate(                                        (string) $utilisateur['date_creation']
                                     )
                                 ) ?>
                             </td>
@@ -822,20 +814,17 @@ te_creation']
 
                             <div class="activite-nom">
                                 <?= e(
-                                    libelleActivite(                                        (string) $activite['actio
-n']
+                                    libelleActivite(                                        (string) $activite['action']
                                     )
                                 ) ?>
                             </div>
 
                             <div class="activite-details">
 
-                                <?php if (                                    $activite['utilisateur_id'] !
-== null
+                                <?php if (                                    $activite['utilisateur_id'] !== null
                                 ): ?>
 
-                                    Utilisateur associé :                                    #<?= (int) $activite['utilisa
-teur_id'] ?>
+                                    Utilisateur associé :                                    #<?= (int) $activite['utilisateur_id'] ?>
 
                                 <?php else: ?>
 
@@ -843,10 +832,8 @@ teur_id'] ?>
 
                                 <?php endif; ?>
 
-                                <?php                                $details = $activite['details'] ?
-? null;
-                                if (is_string($details) && $detai
-ls !== ''):
+                                <?php                                $details = $activite['details'] ?? null;
+                                if (is_string($details) && $details !== ''):
                                 ?>
 
                                     <br>
@@ -857,15 +844,12 @@ ls !== ''):
                                         true
                                     );
                                     ?>
-                                    <?php if (is_array($detailsJs
-on)): ?>
+                                    <?php if (is_array($detailsJson)): ?>
 
                                         <?= e(
                                             json_encode(
-                                                $detailsJson,                                                JSON_UNESCAPED_UN
-ICODE                                                | JSON_UNESCAPED_
-SLASHES                                                | JSON_INVALID_UT
-F8_SUBSTITUTE
+                                                $detailsJson,                                                JSON_UNESCAPED_UNICODE                                                | JSON_UNESCAPED_
+SLASHES                                                | JSON_INVALID_UTF8_SUBSTITUTE
                                             ) ?: ''
                                         ) ?>
 
@@ -883,8 +867,7 @@ F8_SUBSTITUTE
 
                         <time class="activite-date">
                             <?= e(
-                                formaterDate(                                    (string) $activite['date_crea
-tion']
+                                formaterDate(                                    (string) $activite['date_creation']
                                 )
                             ) ?>
                         </time>
@@ -930,8 +913,7 @@ tion']
                     Gestion des utilisateurs
                 </div>
 
-                <div class="raccourci-description">                    Rechercher, modifier, promouvoir ou supprimer
- un compte.
+                <div class="raccourci-description">                    Rechercher, modifier, promouvoir ou supprimer un compte.
                 </div>
 
             </a>
