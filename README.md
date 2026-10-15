@@ -1,3 +1,26 @@
+# Déploiement depuis la page web
+
+L'initialisation avec `sudo bash init/init.sh <domaine>` crée l'utilisateur
+`deploy-compte`, son répertoire personnel et une autorisation sudo limitée au
+script `/usr/local/sbin/deploy-compte`.
+
+L'initialisation génère également `public/deploy.php` (en remplaçant son contenu)
+avec le nom de l'utilisateur et le chemin du script adaptés au site.
+La page appelle ce script avec
+`sudo -n -H -u deploy-compte` : `-H` définit `HOME` sur le répertoire personnel
+de l'utilisateur de déploiement, nécessaire à `git config --global`, et `-n`
+fait échouer explicitement la commande si sudo exige un mot de passe.
+Le nom `deploy-compte` suppose que le répertoire du dépôt s'appelle `compte`,
+car l'initialisation déduit le nom de l'utilisateur du nom de ce répertoire.
+
+Pour vérifier la commande avec les droits du serveur web :
+
+```sh
+sudo -u www-data sudo -n -H -u deploy-compte /usr/local/sbin/deploy-compte
+```
+
+Cette commande effectue réellement le déploiement (`git pull --ff-only`).
+
 # Ajouter l'authentification sur d'autres sites
 
 Procédure : ajouter l'authentification commune à un nouveau site
