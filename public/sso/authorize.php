@@ -18,8 +18,19 @@ session_start();
 require_once dirname(__DIR__, 2) . '/config/database.php';
 require_once dirname(__DIR__, 2) . '/config/services.php';
 
-const SSO_CLIENT_ID = 'video';const SSO_REDIRECT_URI = 'https://video.partitions.ovh/sso/callba
-ck.php';
+// Clients SSO autorises: client_id => redirect_uri exact + service + libelle.
+const SSO_CLIENTS = [
+    'video' => [
+        'redirect_uri' => 'https://video.partitions.ovh/sso/callback.php',
+        'service' => 'video',
+        'label' => 'vidéo',
+    ],
+    'music' => [
+        'redirect_uri' => 'https://musiques.partitions.ovh/php/sso/callback.php',
+        'service' => 'music',
+        'label' => 'musique',
+    ],
+];
 
 function ssoErreur(int $code, string $message): never
 {
@@ -36,19 +47,23 @@ function ssoBase64Url(string $valeur): string
 $parametres = null;
 
 if (
-    isset($_GET['client_id'], $_GET['redirect_uri'],          $_GET['code_challenge'], $_GET['code_challenge_method']
-,
-          $_GET['state'])
+    isset(
+        $_GET['client_id'],
+        $_GET['redirect_uri'],
+        $_GET['code_challenge'],
+        $_GET['code_challenge_method'],
+        $_GET['state']
+    )
 ) {
     $parametres = [
         'client_id' => (string) $_GET['client_id'],
         'redirect_uri' => (string) $_GET['redirect_uri'],
-        'code_challenge' => (string) $_GET['code_challenge'],        'code_challenge_method' => (string) $_GET['code_challenge
-_method'],
+        'code_challenge' => (string) $_GET['code_challenge'],
+        'code_challenge_method' => (string) $_GET['code_challenge_method'],
         'state' => (string) $_GET['state'],
-    ];} elseif (isset($_SESSION['sso_pending']) && is_array($_SESSION['
-sso_pending'])) {    // Reprendre la demande initiale après la connexion au compte
-.
+    ];
+} elseif (isset($_SESSION['sso_pending']) && is_array($_SESSION['sso_pending'])) {
+    // Reprendre la demande initiale après la connexion au compte.
     $parametres = $_SESSION['sso_pending'];
 }
 
@@ -56,17 +71,19 @@ if (!is_array($parametres)) {
     ssoErreur(400, 'Demande SSO absente ou invalide.');
 }
 
+$client = SSO_CLIENTS[$parametres['client_id']] ?? null;
+
 if (
-    $parametres['client_id'] !== SSO_CLIENT_ID
-    || $parametres['redirect_uri'] !== SSO_REDIRECT_URI
-    || $parametres['code_challenge_method'] !== 'S256'    || !preg_match('/\A[A-Za-z0-9_-]{43}\z/', $parametres['code_c
-hallenge'])    || !preg_match('/\A[A-Za-z0-9_-]{43}\z/', $parametres['state'
-])
+    $client === null
+    || $parametres['redirect_uri'] !== $client['redirect_uri']
+    || $parametres['code_challenge_method'] !== 'S256'
+    || !preg_match('/\A[A-Za-z0-9_-]{43}\z/', $parametres['code_challenge'])
+    || !preg_match('/\A[A-Za-z0-9_-]{43}\z/', $parametres['state'])
 ) {
     ssoErreur(400, 'Paramètres SSO invalides.');
 }
-// Si nécessaire, mémoriser la demande avant d'afficher la connex
-ion.
+
+// Si nécessaire, mémoriser la demande avant d'afficher la connexion.
 if (!isset($_SESSION['utilisateur_id'])) {
     $_SESSION['sso_pending'] = $parametres;
 
@@ -92,20 +109,20 @@ try {
         header('Location: /connexion.php');
         exit;
     }
-    // Un compte connecté n'obtient pas automatiquement accès à l
-a vidéo.
+
+    // Un compte connecté n'obtient pas automatiquement accès au service demandé.
     if (
         !utilisateurAAccesService(
             $pdo,
             (int) $_SESSION['utilisateur_id'],
-            'video'
+            $client['service']
         )
     ) {
-        unset($_SESSION['sso_pending']);        ssoErreur(403, 'Accès refusé : ce compte ne dispose pas d
-es droits vidéo.');
+        unset($_SESSION['sso_pending']);
+        ssoErreur(403, 'Accès refusé : ce compte ne dispose pas des droits ' . $client['label'] . '.');
     }
-    // Code aléatoire de 256 bits, transmis uniquement au client
-vidéo.
+
+    // Code aléatoire de 256 bits, transmis uniquement au client.
     $code = ssoBase64Url(random_bytes(32));
     $codeHash = hash('sha256', $code);
 
@@ -121,14 +138,14 @@ vidéo.
     $requete->execute([
         'code_hash' => $codeHash,
         'utilisateur_id' => (int) $_SESSION['utilisateur_id'],
-        'client_id' => SSO_CLIENT_ID,
+        'client_id' => $parametres['client_id'],
         'code_challenge' => $parametres['code_challenge'],
     ]);
 
     unset($_SESSION['sso_pending']);
 
     // L'URL de retour est fixe et a été vérifiée ci-dessus.
-    $urlRetour = SSO_REDIRECT_URI
+    $urlRetour = $client['redirect_uri']
         . '?'
         . http_build_query([
             'code' => $code,
@@ -142,5 +159,5 @@ vidéo.
 
 } catch (Throwable $e) {
     error_log('Erreur SSO authorize : ' . $e->getMessage());
-    ssoErreur(500, 'Une erreur technique est survenue pendant laconnexion.');
+    ssoErreur(500, 'Une erreur technique est survenue pendant la connexion.');
 }
