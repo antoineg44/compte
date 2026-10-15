@@ -18,7 +18,6 @@ session_start();
 require_once dirname(__DIR__, 2) . '/config/database.php';
 require_once dirname(__DIR__, 2) . '/config/services.php';
 
-// Clients SSO autorises: client_id => redirect_uri exact + service + libelle.
 const SSO_CLIENTS = [
     'video' => [
         'redirect_uri' => 'https://video.partitions.ovh/sso/callback.php',
@@ -63,7 +62,6 @@ if (
         'state' => (string) $_GET['state'],
     ];
 } elseif (isset($_SESSION['sso_pending']) && is_array($_SESSION['sso_pending'])) {
-    // Reprendre la demande initiale après la connexion au compte.
     $parametres = $_SESSION['sso_pending'];
 }
 
@@ -83,7 +81,6 @@ if (
     ssoErreur(400, 'Paramètres SSO invalides.');
 }
 
-// Si nécessaire, mémoriser la demande avant d'afficher la connexion.
 if (!isset($_SESSION['utilisateur_id'])) {
     $_SESSION['sso_pending'] = $parametres;
 
@@ -92,7 +89,6 @@ if (!isset($_SESSION['utilisateur_id'])) {
 }
 
 try {
-    // Vérifier que le compte existe toujours.
     $requete = $pdo->prepare(
         'SELECT id
          FROM utilisateurs
@@ -110,7 +106,6 @@ try {
         exit;
     }
 
-    // Un compte connecté n'obtient pas automatiquement accès au service demandé.
     if (
         !utilisateurAAccesService(
             $pdo,
@@ -122,7 +117,6 @@ try {
         ssoErreur(403, 'Accès refusé : ce compte ne dispose pas des droits ' . $client['label'] . '.');
     }
 
-    // Code aléatoire de 256 bits, transmis uniquement au client.
     $code = ssoBase64Url(random_bytes(32));
     $codeHash = hash('sha256', $code);
 
@@ -144,7 +138,6 @@ try {
 
     unset($_SESSION['sso_pending']);
 
-    // L'URL de retour est fixe et a été vérifiée ci-dessus.
     $urlRetour = $client['redirect_uri']
         . '?'
         . http_build_query([
