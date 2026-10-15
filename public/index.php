@@ -359,6 +359,29 @@ try {
                 font-size: 24px;
             }
         }
+
+        .bouton-admin {
+            display: inline-block;
+            padding: 10px 15px;
+            border: 1px solid #c7d2fe;
+            border-radius: 8px;
+            background: #315bea;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background .2s;
+        }
+        
+        .bouton-admin:hover {
+            background: #2448c5;
+        }
+        
+        .actions-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
     </style>
 </head>
 
@@ -368,22 +391,37 @@ try {
 
     <strong>Mon compte</strong>
 
-    <form method="POST" action="deconnexion.php">
+    <div class="actions-header">
 
-        <input
-            type="hidden"
-            name="csrf_token"
-            value="<?= e($_SESSION['csrf_token']) ?>"
-        >
+        <?php if (($_SESSION['utilisateur_admin'] ?? false) === true): ?>
 
-        <button
-            class="bouton-deconnexion"
-            type="submit"
-        >
-            Se déconnecter
-        </button>
+            <a
+                class="bouton-admin"
+                href="./admin"
+            >
+                Administration
+            </a>
 
-    </form>
+        <?php endif; ?>
+
+        <form method="POST" action="deconnexion.php">
+
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="<?= e($_SESSION['csrf_token']) ?>"
+            >
+
+            <button
+                class="bouton-deconnexion"
+                type="submit"
+            >
+                Se déconnecter
+            </button>
+
+        </form>
+
+    </div>
 
 </header>
 
