@@ -1,25 +1,33 @@
 # Déploiement depuis la page web
 
 L'initialisation avec `sudo bash init/init.sh <domaine>` crée l'utilisateur
-`deploy-compte`, son répertoire personnel et une autorisation sudo limitée au
-script `/usr/local/sbin/deploy-compte`.
+de déploiement, son répertoire personnel, le script Git et un service systemd
+activé par socket Unix. Elle génère aussi `public/deploy.php` en remplaçant son
+contenu. Relancer cette initialisation est nécessaire pour migrer l'installation
+précédente : l'ancienne autorisation sudo du site est supprimée.
 
-L'initialisation génère également `public/deploy.php` (en remplaçant son contenu)
-avec le nom de l'utilisateur et le chemin du script adaptés au site.
-La page appelle ce script avec
-`sudo -n -H -u deploy-compte` : `-H` définit `HOME` sur le répertoire personnel
-de l'utilisateur de déploiement, nécessaire à `git config --global`, et `-n`
-fait échouer explicitement la commande si sudo exige un mot de passe.
-Le nom `deploy-compte` suppose que le répertoire du dépôt s'appelle `compte`,
-car l'initialisation déduit le nom de l'utilisateur du nom de ce répertoire.
+Pour un dépôt nommé `compte`, PHP se connecte à `/run/deploy-compte.sock`.
+systemd lance alors `deploy-compte@.service` sous l'utilisateur `deploy-compte`,
+avec son `HOME` explicite. La page n'exécute aucune commande shell ni sudo et
+attend le résultat de Git pour l'afficher immédiatement.
+Le socket est accessible uniquement à l'utilisateur de déploiement et au groupe
+`www-data`. Aucun port réseau n'est ouvert.
 
-Pour vérifier la commande avec les droits du serveur web :
+Les noms sont adaptés automatiquement au nom du répertoire du dépôt.
+Le déploiement est limité à 90 secondes et un verrou empêche deux mises à jour
+simultanées. Les échecs sont journalisés et retournent un statut HTTP d'erreur.
+Les éventuels délais du proxy ou de PHP-FPM doivent permettre cette attente.
+Les identifiants Git/SSH doivent être configurés pour l'utilisateur de déploiement.
+L'accès HTTP à cette page doit être réservé aux administrateurs.
+
+Après initialisation, vérifier le socket et consulter les erreurs :
 
 ```sh
-sudo -u www-data sudo -n -H -u deploy-compte /usr/local/sbin/deploy-compte
+sudo systemctl status deploy-compte.socket
+sudo journalctl -u 'deploy-compte@*' --since '5 minutes ago'
 ```
 
-Cette commande effectue réellement le déploiement (`git pull --ff-only`).
+Ouvrir ensuite la page déclenche réellement le déploiement (`git pull --ff-only`).
 
 # Ajouter l'authentification sur d'autres sites
 
