@@ -102,10 +102,6 @@ set -Eeuo pipefail
 export HOME='/var/lib/$DEPLOY_USER'
 export GIT_CONFIG_GLOBAL="\$HOME/.gitconfig"
 
-# Créer le répertoire personnel si nécessaire
-mkdir -p "\$HOME"
-chown '$DEPLOY_USER:$SITE_GROUP' "\$HOME"
-
 # Autoriser ce dépôt pour Git
 /usr/bin/git config --global --add safe.directory '$SITE_DIR'
 
