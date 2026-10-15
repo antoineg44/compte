@@ -18,8 +18,7 @@ if (isset($_SESSION['flash_admin'])) {    $message = (string) ($_SESSION['flash_
 
 /**
  * Enregistre un message puis redirige vers la liste.
- */function redirigerAvecMessage(string $message, string $type): nev
-er
+ */function redirigerAvecMessage(string $message, string $type): never
 {
     $_SESSION['flash_admin'] = [
         'message' => $message,
@@ -80,8 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         && $idUtilisateur === $idConnecte
         && (string) ($_POST['nouveau_role'] ?? '') !== 'admin'
     ) {
-        redirigerAvecMessage(            'Tu ne peux pas retirer tes propres droits administra
-teur.',
+        redirigerAvecMessage(            'Tu ne peux pas retirer tes propres droits administrateur.',
             'erreur'
         );
     }
@@ -150,8 +148,7 @@ teur.',
                 && $nouveauRole !== 'admin'
                 && count($administrateurs) <= 1
             ) {
-                throw new DomainException(                    'Impossible de retirer les droits du dernier
-administrateur.'
+                throw new DomainException(                    'Impossible de retirer les droits du dernier administrateur.'
                 );
             }
 
@@ -197,8 +194,7 @@ administrateur.'
                 $cible['role'] === 'admin'
                 && count($administrateurs) <= 1
             ) {
-                throw new DomainException(                    'Impossible de supprimer le dernier administr
-ateur.'
+                throw new DomainException(                    'Impossible de supprimer le dernier administrateur.'
                 );
             }
 
@@ -643,8 +639,7 @@ ale=1.0">
 
     <h1>Gestion des utilisateurs</h1>
 
-    <p class="description">        Modifie les comptes, gère les rôles et supprime les compt
-es
+    <p class="description">        Modifie les comptes, gère les rôles et supprime les comptes
         qui ne sont plus nécessaires.
     </p>
 
@@ -668,13 +663,11 @@ es
                 Les informations du compte ont été modifiées.
             </div>
         <?php endif; ?>
-        <form method="GET" action="utilisateurs.php" class="reche
-rche">
+        <form method="GET" action="utilisateurs.php" class="recherche">
 
             <input
                 type="search"
-                name="q"                placeholder="Rechercher un identifiant ou un e-ma
-il..."
+                name="q"                placeholder="Rechercher un identifiant ou un e-mail..."
                 value="<?= e($recherche) ?>"
                 maxlength="255"
             >
@@ -683,8 +676,7 @@ il..."
                 Rechercher
             </button>
 
-            <?php if ($recherche !== ''): ?>                <a class="bouton secondaire" href="utilisateurs.p
-hp">
+            <?php if ($recherche !== ''): ?>                <a class="bouton secondaire" href="utilisateurs.php">
                     Réinitialiser
                 </a>
             <?php endif; ?>
@@ -712,46 +704,37 @@ hp">
                     </thead>
 
                     <tbody>
-                    <?php foreach ($utilisateurs as $utilisateur)
-: ?>
+                    <?php foreach ($utilisateurs as $utilisateur): ?>
 
-                        <tr>                            <td><?= (int) $utilisateur['id'] ?></
-td>
+                        <tr>                            <td><?= (int) $utilisateur['id'] ?></td>
 
-                            <td>                                <?= e($utilisateur['identifiant']
-) ?>
+                            <td>                                <?= e($utilisateur['identifiant']) ?>
                             </td>
 
                             <td>
                                 <?= e($utilisateur['email']) ?>
                             </td>
 
-                            <td>                                <?php if ($utilisateur['role'] ==
-= 'admin'): ?>
-                                    <span class="badge badge-admi
-n">
+                            <td>                                <?php if ($utilisateur['role'] === 'admin'): ?>
+                                    <span class="badge badge-admin">
                                         Administrateur
                                     </span>
 
-                                <?php elseif (                                    $utilisateur['role'] === 'mod
-erator'
+                                <?php elseif (                                    $utilisateur['role'] === 'moderator'
                                 ): ?>
-                                    <span class="badge badge-mode
-rator">
+                                    <span class="badge badge-moderator">
                                         Modérateur
                                     </span>
 
                                 <?php else: ?>
-                                    <span class="badge badge-user
-">
+                                    <span class="badge badge-user">
                                         Utilisateur
                                     </span>
 
                                 <?php endif; ?>
                             </td>
 
-                            <td>                                <?= e((string) $utilisateur['date
-_creation']) ?>
+                            <td>                                <?= e((string) $utilisateur['date_creation']) ?>
                             </td>
 
                             <td class="actions">
@@ -759,32 +742,23 @@ _creation']) ?>
                                 <div class="actions-ligne">
 
                                     <a
-                                        class="bouton secondaire"                                        href="modifier-utilisateu
-r.php?id=<?= (int) $utilisateur['id'] ?>"
+                                        class="bouton secondaire" href="modifier-utilisateur.php?id=<?= (int) $utilisateur['id'] ?>"
                                     >
                                         Modifier
                                     </a>
 
                                     <?php if (
-                                        (int) $utilisateur['id']                                        !== (int) $_SESSION['util
-isateur_id']
-                                    ): ?>
+                                        (int) $utilisateur['id'] !== (int) $_SESSION['utilisateur_id']): ?>
 
-                                        <?php if (                                            $utilisateur['role']
-=== 'admin'
-                                        ): ?>
+                                        <?php if ( $utilisateur['role']=== 'admin'): ?>
 
                                             <form method="POST">
                                                 <input
-                                                    type="hidden"                                                    name="csrf_to
-ken"                                                    value="<?= e(
-$_SESSION['csrf_token']) ?>"
+                                                    type="hidden"                                                    name="csrf_token"                                                    value="<?= e($_SESSION['csrf_token']) ?>"
                                                 >
 
                                                 <input
-                                                    type="hidden"                                                    name="id_util
-isateur"                                                    value="<?= (i
-nt) $utilisateur['id'] ?>"
+                                                    type="hidden"                                                    name="id_utilisateur"                                                    value="<?= (int) $utilisateur['id'] ?>"
                                                 >
 
                                                 <input
@@ -794,35 +768,27 @@ nt) $utilisateur['id'] ?>"
                                                 >
 
                                                 <input
-                                                    type="hidden"                                                    name="nouveau
-_role"
+                                                    type="hidden"                                                    name="nouveau_role"
                                                     value="user"
                                                 >
 
-                                                <button                                                    class="bouton
- secondaire"
-                                                    type="submit"                                                    onclick="return confirm('Retirer les droits administrateur de cet utilisateur
-?');"
+                                                <button                                                    class="bouton secondaire"
+                                                    type="submit"      onclick="return confirm('Retirer les droits administrateur de cet utilisateur?');"
                                                 >
                                                     Retirer admin
                                                 </button>
                                             </form>
 
-                                        <?php elseif (                                            $utilisateur['role']
-=== 'user'
+                                        <?php elseif (                                            $utilisateur['role']=== 'user'
                                         ): ?>
 
                                             <form method="POST">
                                                 <input
-                                                    type="hidden"                                                    name="csrf_to
-ken"                                                    value="<?= e(
-$_SESSION['csrf_token']) ?>"
+                                                    type="hidden"                                                    name="csrf_token"                                                   value="<?= e($_SESSION['csrf_token']) ?>"
                                                 >
 
                                                 <input
-                                                    type="hidden"                                                    name="id_util
-isateur"                                                    value="<?= (i
-nt) $utilisateur['id'] ?>"
+                                                    type="hidden"                                                    name="id_utilisateur"                                                    value="<?= (int) $utilisateur['id'] ?>"
                                                 >
 
                                                 <input
@@ -832,15 +798,12 @@ nt) $utilisateur['id'] ?>"
                                                 >
 
                                                 <input
-                                                    type="hidden"                                                    name="nouveau
-_role"
+                                                    type="hidden"                                                    name="nouveau_role"
                                                     value="admin"
                                                 >
 
-                                                <button                                                    class="bouton
-"
-                                                    type="submit"                                                    onclick="return confirm('Accorder les droits administrateur à cet utilisateur
-?');"
+                                                <button                                                    class="bouton"
+                                                    type="submit"                                                    onclick="return confirm('Accorder les droits administrateur à cet utilisateur?');"
                                                 >
                                                     Rendre admin
                                                 </button>
@@ -851,14 +814,11 @@ _role"
                                         <form method="POST">
                                             <input
                                                 type="hidden"
-                                                name="csrf_token"                                                value="<?= e($_SE
-SSION['csrf_token']) ?>"
+                                                name="csrf_token"                                                value="<?= e($_SESSION['csrf_token']) ?>"
                                             >
 
                                             <input
-                                                type="hidden"                                                name="id_utilisat
-eur"                                                value="<?= (int)
-$utilisateur['id'] ?>"
+                                                type="hidden"                                                name="id_utilisateur"                                                value="<?= (int)$utilisateur['id'] ?>"
                                             >
 
                                             <input
@@ -867,18 +827,15 @@ $utilisateur['id'] ?>"
                                                 value="supprimer"
                                             >
 
-                                            <button                                                class="bouton dan
-ger"
-                                                type="submit"                                                onclick="return confirm('ATTENTION : cette suppression est définitive. Supprimer c
-e compte ?');"
+                                            <button                                                class="bouton danger"
+                                                type="submit"                                                onclick="return confirm('ATTENTION : cette suppression est définitive. Supprimer ce compte ?');"
                                             >
                                                 Supprimer
                                             </button>
                                         </form>
 
                                     <?php else: ?>
-                                        <span class="badge badge-
-admin">
+                                        <span class="badge badge-admin">
                                             Votre compte
                                         </span>
 
