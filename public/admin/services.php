@@ -41,8 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     || mb_strlen($slug) > 100
                     || mb_strlen($description) > 255
                 ) {
-                    throw new InvalidArgumentException(                        'Vérifie le nom, le slug et la descriptio
-n.'
+                    throw new InvalidArgumentException(                        'Vérifie le nom, le slug et la description.'
                     );
                 }
 
@@ -65,8 +64,7 @@ n.'
                     $pdo,
                     'service_cree',
                     (int) $_SESSION['utilisateur_id'],
-                    [                        'service_id' => (int) $pdo->lastInsertId(
-),
+                    [                        'service_id' => (int) $pdo->lastInsertId(),
                         'slug' => $slug,
                     ]
                 );
@@ -95,8 +93,7 @@ n.'
                     || mb_strlen($slug) > 100
                     || mb_strlen($description) > 255
                 ) {
-                    throw new InvalidArgumentException(                        'Les informations du service sont invalid
-es.'
+                    throw new InvalidArgumentException(                        'Les informations du service sont invalides.'
                     );
                 }
 
@@ -184,8 +181,7 @@ es.'
             $erreur = $e->getMessage();
         } catch (PDOException $e) {
             if ((string) $e->getCode() === '23000') {
-                $erreur =                    'Ce nom ou cet identifiant technique est déjà
- utilisé.';
+                $erreur =                    'Ce nom ou cet identifiant technique est déjà utilisé.';
             } else {
                 error_log(
                     'Erreur de gestion des services : '
@@ -406,9 +402,7 @@ eurs.
     <section class="section">
         <h2>Ajouter un service</h2>
 
-        <p class="description">            Le slug est l'identifiant technique utilisé dans le c
-ode PHP.            Exemple : <code>documents</code> ou <code>statistique
-s</code>.
+        <p class="description">Le slug est l'identifiant technique utilisé dans le code PHP. Exemple : <code>documents</code> ou <code>statistiques</code>.
         </p>
 
         <form method="post">
@@ -479,39 +473,31 @@ s</code>.
                     <tbody>
                     <?php foreach ($services as $service): ?>
                         <tr>
-                            <td>                                <strong><?= e($service['nom']) ?>
-</strong>
+                            <td>                                <strong><?= e($service['nom']) ?></strong>
 
                                 <p>
-                                    <?= e(                                        (string) ($service['descr
-iption'] ?? '')
+                                    <?= e(                                        (string) ($service['description'] ?? '')
                                     ) ?>
                                 </p>
                             </td>
 
-                            <td>                                <code><?= e($service['slug']) ?><
-/code>
+                            <td>                                <code><?= e($service['slug']) ?></code>
                             </td>
 
-                            <td>                                <?= (int) $service['nombre_autori
-sations'] ?>
+                            <td>                                <?= (int) $service['nombre_autorisations'] ?>
                                 accès autorisé(s)
                             </td>
 
-                            <td>                                <span class="statut <?= (int) $se
-rvice['actif'] === 1
+                            <td>                                <span class="statut <?= (int) $service['actif'] === 1
                                     ? 'actif'
-                                    : 'inactif' ?>">                                    <?= (int) $service['actif'] =
-== 1
+                                    : 'inactif' ?>">                                    <?= (int) $service['actif'] === 1
                                         ? 'Actif'
                                         : 'Désactivé' ?>
                                 </span>
-                                <form method="post" class="form-i
-nline">
+                                <form method="post" class="form-inline">
                                     <input
                                         type="hidden"
-                                        name="csrf_token"                                        value="<?= e($_SESSION['c
-srf_token']) ?>"
+                                        name="csrf_token"                                        value="<?= e($_SESSION['csrf_token']) ?>"
                                     >
 
                                     <input
@@ -522,15 +508,13 @@ srf_token']) ?>"
 
                                     <input
                                         type="hidden"
-                                        name="id"                                        value="<?= (int) $service
-['id'] ?>"
+                                        name="id"                                        value="<?= (int) $service['id'] ?>"
                                     >
 
                                     <button
                                         type="submit"
                                         class="secondaire"
-                                    >                                        <?= (int) $service['actif
-'] === 1
+                                    >                                        <?= (int) $service['actif'] === 1
                                             ? 'Désactiver'
                                             : 'Activer' ?>
                                     </button>
@@ -541,8 +525,7 @@ srf_token']) ?>"
                                 <form method="post">
                                     <input
                                         type="hidden"
-                                        name="csrf_token"                                        value="<?= e($_SESSION['c
-srf_token']) ?>"
+                                        name="csrf_token"                                        value="<?= e($_SESSION['csrf_token']) ?>"
                                     >
 
                                     <input
@@ -553,8 +536,7 @@ srf_token']) ?>"
 
                                     <input
                                         type="hidden"
-                                        name="id"                                        value="<?= (int) $service
-['id'] ?>"
+                                        name="id"                                        value="<?= (int) $service['id'] ?>"
                                     >
 
                                     <label>
@@ -562,8 +544,7 @@ srf_token']) ?>"
                                         <input
                                             class="champ-table"
                                             name="nom"
-                                            maxlength="100"                                            value="<?= e($service
-['nom']) ?>"
+                                            maxlength="100"                                            value="<?= e($service['nom']) ?>"
                                             required
                                         >
                                     </label>
@@ -573,9 +554,7 @@ srf_token']) ?>"
                                         <input
                                             class="champ-table"
                                             name="slug"
-                                            maxlength="100"                                            pattern="[a-z0-9]+(-[
-a-z0-9]+)*"                                            value="<?= e($service
-['slug']) ?>"
+                                            maxlength="100" pattern="[a-z0-9]+(-[a-z0-9]+)*"value="<?= e($service['slug']) ?>"
                                             required
                                         >
                                     </label>
