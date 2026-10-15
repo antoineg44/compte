@@ -17,7 +17,7 @@ session_start();
 require_once dirname(__DIR__) . '/config/database.php';
 
 if (isset($_SESSION['utilisateur_id'])) {
-    header('Location: espace.php');
+    header('Location: index.php');
     exit;
 }
 
