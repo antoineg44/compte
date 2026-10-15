@@ -178,8 +178,7 @@ ssayer.';
                             'role' => $role,
                         ]
                     );
-                    if (isset($_SESSION['sso_pending']) && is_arr
-ay($_SESSION['sso_pending'])) {
+                    if (isset($_SESSION['sso_pending']) && is_array($_SESSION['sso_pending'])) {
                         header('Location: /sso/authorize.php');
                     } else {
                         header('Location: espace.php');
