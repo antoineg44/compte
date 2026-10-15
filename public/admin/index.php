@@ -848,8 +848,7 @@ function libelleActivite(string $action): string
 
                                         <?= e(
                                             json_encode(
-                                                $detailsJson,                                                JSON_UNESCAPED_UNICODE                                                | JSON_UNESCAPED_
-SLASHES                                                | JSON_INVALID_UTF8_SUBSTITUTE
+                                                $detailsJson, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE
                                             ) ?: ''
                                         ) ?>
 
