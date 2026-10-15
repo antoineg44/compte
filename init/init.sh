@@ -26,6 +26,7 @@ DEPLOY_USER="deploy-${SITE_NAME}"
 SITE_GROUP="$SITE_NAME"
 DEPLOY_HELPER="/usr/local/sbin/deploy-${SITE_NAME}"
 SUDOERS_FILE="/etc/sudoers.d/deploy-${SITE_NAME}"
+DEPLOY_PAGE="$SITE_DIR/public/deploy.php"
 
 echo "== Initialisation du site : $SITE_NAME =="
 echo "Domaine : $DOMAIN"
@@ -122,6 +123,28 @@ if ! visudo -cf "$SUDOERS_FILE"; then
     exit 1
 fi
 
+# Génération de la page avec l'utilisateur propre à ce site
+cat > "$DEPLOY_PAGE" <<EOF
+<?php
+\$output = [];
+\$returnCode = 0;
+
+exec(
+    'sudo -n -H -u $DEPLOY_USER $DEPLOY_HELPER 2>&1',
+    \$output,
+    \$returnCode
+);
+
+echo implode("\n", \$output);
+
+if (\$returnCode !== 0) {
+    error_log('Échec du déploiement Git : ' . implode("\n", \$output));
+}
+EOF
+
+chown "$DEPLOY_USER:$SITE_GROUP" "$DEPLOY_PAGE"
+chmod 0640 "$DEPLOY_PAGE"
+
 # Vérification Apache avant le rechargement
 if ! apache2ctl configtest; then
     echo "Erreur de configuration Apache."
@@ -139,4 +162,4 @@ echo "Dépôt Git : $SITE_DIR"
 echo "Utilisateur de déploiement : $DEPLOY_USER"
 echo
 echo "Commande de déploiement autorisée :"
-echo "sudo -u $DEPLOY_USER $DEPLOY_HELPER"
+echo "sudo -n -H -u $DEPLOY_USER $DEPLOY_HELPER"
