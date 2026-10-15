@@ -548,7 +548,7 @@ function libelleActivite(string $action): string
             Utilisateurs
         </a>
 
-        <a href="../espace.php">
+        <a href="../index.php">
             Mon espace
         </a>
 <a href="services.php">Gestion des services</a>
@@ -938,7 +938,7 @@ tion']
 
             <a
                 class="raccourci"
-                href="../espace.php"
+                href="../index.php"
             >
 
                 <div class="raccourci-titre">
