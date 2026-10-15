@@ -98,13 +98,20 @@ cat > "$DEPLOY_HELPER" <<EOF
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-# Déclarer le dépôt comme sûr pour l'utilisateur de déploiement
+# Définir explicitement l'environnement de l'utilisateur de déploiement
+export HOME='/var/lib/$DEPLOY_USER'
+export GIT_CONFIG_GLOBAL="\$HOME/.gitconfig"
+
+# Créer le répertoire personnel si nécessaire
+mkdir -p "\$HOME"
+chown '$DEPLOY_USER:$SITE_GROUP' "\$HOME"
+
+# Autoriser ce dépôt pour Git
 /usr/bin/git config --global --add safe.directory '$SITE_DIR'
 
 # Mettre à jour le dépôt
 exec /usr/bin/git -C '$SITE_DIR' pull --ff-only
 EOF
-
 
 chown root:root "$DEPLOY_HELPER"
 chmod 0755 "$DEPLOY_HELPER"
