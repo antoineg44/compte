@@ -3,7 +3,7 @@ $output = [];
 $returnCode = 0;
 
 exec(
-    'sudo /usr/local/sbin/deploy-NOM_DU_SITE 2>&1',
+    '/usr/local/sbin/deploy-compte.partitions.ovh 2>&1',
     $output,
     $returnCode
 );
