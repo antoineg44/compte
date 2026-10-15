@@ -3,7 +3,7 @@ $output = [];
 $returnCode = 0;
 
 exec(
-    '/usr/local/sbin/deploy-compte 2>&1',
+    'sudo -n -H -u deploy-compte /usr/local/sbin/deploy-compte 2>&1',
     $output,
     $returnCode
 );
