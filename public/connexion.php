@@ -24,7 +24,7 @@ if (isset($_SESSION['utilisateur_id'])) {    if (isset($_SESSION['sso_pending'])
 o_pending'])) {
         header('Location: /sso/authorize.php');
     } else {
-        header('Location: espace.php');
+        header('Location: index.php');
     }
     exit;
 }
@@ -181,7 +181,7 @@ ssayer.';
                     if (isset($_SESSION['sso_pending']) && is_array($_SESSION['sso_pending'])) {
                         header('Location: /sso/authorize.php');
                     } else {
-                        header('Location: espace.php');
+                        header('Location: index.php');
                     }
                     exit;
 
