@@ -98,10 +98,6 @@ cat > "$DEPLOY_HELPER" <<EOF
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-# Définir explicitement l'environnement de l'utilisateur de déploiement
-export HOME='/var/lib/$DEPLOY_USER'
-export GIT_CONFIG_GLOBAL="\$HOME/.gitconfig"
-
 # Autoriser ce dépôt pour Git
 /usr/bin/git config --global --add safe.directory '$SITE_DIR'
 
