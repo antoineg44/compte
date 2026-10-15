@@ -60,8 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit('Requête invalide. Recharge la page.');
     }
     if (!preg_match('/\A[a-zA-Z0-9_.-]{3,50}\z/', $identifiant))
-{        $erreur = 'L’identifiant doit contenir entre 3 et 50 cara
-ctères : lettres, chiffres, points, tirets ou tirets bas.';
+{        $erreur = 'L’identifiant doit contenir entre 3 et 50 caractères : lettres, chiffres, points, tirets ou tirets bas.';
     } elseif (
         strlen($email) > 255
         || !filter_var($email, FILTER_VALIDATE_EMAIL)
@@ -88,8 +87,7 @@ ctères : lettres, chiffres, points, tirets ou tirets bas.';
                     'Cet utilisateur n’existe plus.'
                 );
             }
-            // Vérifier que l'identifiant n'est pas utilisé aille
-urs.
+            // Vérifier que l'identifiant n'est pas utilisé ailleurs.
             $requete = $pdo->prepare(
                 'SELECT id
                  FROM utilisateurs
@@ -150,8 +148,7 @@ urs.
                     'utilisateur_cible' => (int) $id,
                     'ancien_identifiant' =>
                         $ancienUtilisateur['identifiant'],
-                    'nouvel_identifiant' => $identifiant,                    'ancien_email' => $ancienUtilisateur['email']
-,
+                    'nouvel_identifiant' => $identifiant,                    'ancien_email' => $ancienUtilisateur['email'],
                     'nouvel_email' => $email,
                 ]
             );
@@ -162,8 +159,7 @@ urs.
             // modifie son propre compte.
             if (
                 (int) $id === (int) $_SESSION['utilisateur_id']
-            ) {                $_SESSION['utilisateur_identifiant'] = $identifia
-nt;
+            ) {                $_SESSION['utilisateur_identifiant'] = $identifiant;
                 $_SESSION['utilisateur_email'] = $email;
             }
 
