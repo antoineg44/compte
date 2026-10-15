@@ -155,10 +155,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $requete->execute([
                     'utilisateur_id' => $utilisateurId,
                     'service_id' => $serviceId,
-                    'autorise' => $autorise,                    'modifie_par' => (int) $_SESSION['utilisateur
-_id'],
-                    'autorise_update' => $autorise,                    'modifie_par_update' => (int) $_SESSION['util
-isateur_id'],
+                    'autorise' => $autorise,                    'modifie_par' => (int) $_SESSION['utilisateur_id'],
+                    'autorise_update' => $autorise,                    'modifie_par_update' => (int) $_SESSION['utilisateur_id'],
                 ]);
             }
 
@@ -175,8 +173,7 @@ isateur_id'],
                     ),
                 ]
             );
-            // Éviter de renvoyer le formulaire lors d'un rafraîc
-hissement.
+            // Éviter de renvoyer le formulaire lors d'un rafraîchissement.
             header(
                 'Location: acces-services.php?utilisateur_id='
                 . $utilisateurId
@@ -528,8 +525,7 @@ if ($utilisateurId !== null) {
                         <article class="utilisateur">
 
                             <div>
-                                <div class="utilisateur-nom">                                    <?= e($compte['identifiant'])
- ?>
+                                <div class="utilisateur-nom">                                    <?= e($compte['identifiant']) ?>
                                 </div>
 
                                 <div class="utilisateur-email">
@@ -543,8 +539,7 @@ if ($utilisateurId !== null) {
                             </div>
 
                             <a
-                                class="bouton"                                href="acces-services.php?utilisat
-eur_id=<?= (int) $compte['id'] ?>"
+                                class="bouton"                                href="acces-services.php?utilisateur_id=<?= (int) $compte['id'] ?>"
                             >
                                 Gérer les accès
                             </a>
@@ -579,8 +574,7 @@ eur_id=<?= (int) $compte['id'] ?>"
 
                 <p>
                     Aucun service n'a été créé.
-                    Commence par en ajouter dans la                    <a href="services.php">gestion des services</
-a>.
+                    Commence par en ajouter dans la                    <a href="services.php">gestion des services</a>.
                 </p>
 
             <?php else: ?>
@@ -615,8 +609,7 @@ a>.
                             $accesAutorises,
                             true
                         );
-                        $serviceActif = (int) $service['actif'] =
-== 1;
+                        $serviceActif = (int) $service['actif'] === 1;
                         ?>
 
                         <div class="service">
@@ -628,28 +621,23 @@ a>.
                                 value="<?= $serviceId ?>"
                                 <?= $autorise ? 'checked' : '' ?>
                             >
-                            <label for="service-<?= $serviceId ?>
-">
+                            <label for="service-<?= $serviceId ?>">
 
                                 <div class="service-nom">
                                     <?= e($service['nom']) ?>
                                 </div>
 
                                 <div class="service-description">
-                                    <?= e(                                        (string) ($service['descr
-iption'] ?? '')
+                                    <?= e(                                        (string) ($service['description'] ?? '')
                                     ) ?>
                                     <br>
-                                    Identifiant :                                    <code><?= e($service['slug'])
- ?></code>
+                                    Identifiant :                                    <code><?= e($service['slug']) ?></code>
                                 </div>
-                                <span class="statut <?= $serviceA
-ctif
+                                <span class="statut <?= $serviceActif
                                     ? 'actif'
                                     : 'inactif' ?>">
                                     <?= $serviceActif
-                                        ? 'Service actif'                                        : 'Service désactivé glob
-alement' ?>
+                                        ? 'Service actif'                                        : 'Service désactivé globalement' ?>
                                 </span>
 
                             </label>
