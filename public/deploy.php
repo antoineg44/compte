@@ -3,7 +3,7 @@ $output = [];
 $returnCode = 0;
 
 exec(
-    '/usr/local/sbin/deploy-compte.partitions.ovh 2>&1',
+    '/usr/local/sbin/deploy-compte 2>&1',
     $output,
     $returnCode
 );
