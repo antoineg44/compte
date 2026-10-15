@@ -97,8 +97,14 @@ a2ensite "$APACHE_CONF"
 cat > "$DEPLOY_HELPER" <<EOF
 #!/usr/bin/env bash
 set -Eeuo pipefail
+
+# Déclarer le dépôt comme sûr pour l'utilisateur de déploiement
+/usr/bin/git config --global --add safe.directory '$SITE_DIR'
+
+# Mettre à jour le dépôt
 exec /usr/bin/git -C '$SITE_DIR' pull --ff-only
 EOF
+
 
 chown root:root "$DEPLOY_HELPER"
 chmod 0755 "$DEPLOY_HELPER"
