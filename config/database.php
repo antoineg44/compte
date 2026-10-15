@@ -23,8 +23,7 @@ try {
         $options
     );
 } catch (PDOException $e) {
-    error_log('Erreur de connexion à la base de données : ' . $e-
->getMessage());
+    error_log('Erreur de connexion à la base de données : ' . $e->getMessage());
 
     http_response_code(500);
     exit('Une erreur interne est survenue.');
