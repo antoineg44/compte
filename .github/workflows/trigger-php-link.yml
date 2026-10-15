@@ -1,0 +1,18 @@
+name: Exécuter une action après un commit et appeler un lien PHP
+
+on:
+  push:
+    paths:
+      - '**/*'  # Cela déclenche l'action pour tous les fichiers modifiés
+
+jobs:
+  post_commit_action:
+    runs-on: ubuntu-latest  # Spécifie l'environnement d'exécution (ici, Ubuntu)
+
+    steps:
+      - name: Effectuer l'action après le commit
+        run: |
+          echo "Action effectuée après le commit sur la branche ${{ github.ref_name }}"
+          
+          # Appel à un script PHP via curl
+          curl -X GET -k "https://compte.partitions.ovh/php/deploy.php"
