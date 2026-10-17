@@ -45,7 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!hash_equals($_SESSION['csrf_token'], $csrfToken)) {        $erreurs[] = 'Le formulaire a expiré. Veuillez réessayer.';
     }
 
-    // Validation de l'identifiant    if (!preg_match('/\A[a-zA-Z0-9_.-]{3,50}\z/', $identifiant))
+    // Validation de l'identifiant    
+    if (!preg_match('/\A[a-zA-Z0-9_.-]{3,50}\z/', $identifiant))
 {        $erreurs[] = 'L’identifiant doit contenir entre 3 et 50 caractères : lettres sans accent, chiffres, points, tirets ou underscores.';
     }
 
