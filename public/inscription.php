@@ -1,8 +1,7 @@
 <?php
 
 declare(strict_types=1);
-$isHttps = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off
-';
+$isHttps = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
 
 session_set_cookie_params([
     'lifetime' => 0,
@@ -43,32 +42,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $csrfToken = (string) ($_POST['csrf_token'] ?? '');
 
     // Protection CSRF
-    if (!hash_equals($_SESSION['csrf_token'], $csrfToken)) {        $erreurs[] = 'Le formulaire a expiré. Veuillez réessayer.
-';
+    if (!hash_equals($_SESSION['csrf_token'], $csrfToken)) {        $erreurs[] = 'Le formulaire a expiré. Veuillez réessayer.';
     }
 
     // Validation de l'identifiant    if (!preg_match('/\A[a-zA-Z0-9_.-]{3,50}\z/', $identifiant))
-{        $erreurs[] = 'L’identifiant doit contenir entre 3 et 50 caractères : lettres sans accent, chiffres, points, tirets ou unde
-rscores.';
+{        $erreurs[] = 'L’identifiant doit contenir entre 3 et 50 caractères : lettres sans accent, chiffres, points, tirets ou underscores.';
     }
 
     // Validation de l'adresse e-mail
     if (
         !filter_var($email, FILTER_VALIDATE_EMAIL)
         || strlen($email) > 255
-    ) {        $erreurs[] = 'Veuillez saisir une adresse e-mail valide d
-e 255 caractères maximum.';
+    ) {        $erreurs[] = 'Veuillez saisir une adresse e-mail valide de 255 caractères maximum.';
     }
 
     // Validation du mot de passe
-    if (strlen($motDePasse) < 8) {        $erreurs[] = 'Le mot de passe doit contenir au moins 8 oc
-tets.';
+    if (strlen($motDePasse) < 8) {        $erreurs[] = 'Le mot de passe doit contenir au moins 8 octets.';
     }
-    // PASSWORD_DEFAULT utilise actuellement bcrypt dans les vers
-ions
+    // PASSWORD_DEFAULT utilise actuellement bcrypt dans les versions
     // PHP usuelles : bcrypt ne prend en compte que 72 octets.
-    if (strlen($motDePasse) > 72) {        $erreurs[] = 'Le mot de passe ne doit pas dépasser 72 oct
-ets.';
+    if (strlen($motDePasse) > 72) {        $erreurs[] = 'Le mot de passe ne doit pas dépasser 72 octets.';
     }
 
     if ($motDePasse !== $confirmation) {
@@ -91,8 +84,7 @@ ets.';
                 'email' => $email,
             ]);
 
-            if ($requete->fetch()) {                $erreurs[] = 'Cet identifiant ou cette adresse e-
-mail est déjà utilisé.';
+            if ($requete->fetch()) {                $erreurs[] = 'Cet identifiant ou cette adresse e-mail est déjà utilisé.';
             } else {
                 $hachage = password_hash(
                     $motDePasse,
@@ -112,21 +104,17 @@ mail est déjà utilisé.';
                     'mot_de_passe' => $hachage,
                 ]);
 
-                // Redirection après inscription                $_SESSION['csrf_token'] = bin2hex(random_bytes(32
-));
+                // Redirection après inscription                
+                $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
                 header('Location: inscription.php?succes=1');
                 exit;
             }
-        } catch (PDOException $e) {            // 23000 correspond notamment à une violation de cont
-rainte UNIQUE.
-            if ($e->getCode() === '23000') {                $erreurs[] = 'Cet identifiant ou cette adresse e-
-mail est déjà utilisé.';
-            } else {                error_log('Erreur inscription : ' . $e->getMessag
-e());
+        } catch (PDOException $e) {            // 23000 correspond notamment à une violation de contrainte UNIQUE.
+            if ($e->getCode() === '23000') {                $erreurs[] = 'Cet identifiant ou cette adresse e-mail est déjà utilisé.';
+            } else {                error_log('Erreur inscription : ' . $e->getMessage());
                 http_response_code(500);
-                $erreurs[] = 'Une erreur technique est survenue.
-Veuillez réessayer plus tard.';
+                $erreurs[] = 'Une erreur technique est survenue.Veuillez réessayer plus tard.';
             }
         }
     }
@@ -137,8 +125,7 @@ Veuillez réessayer plus tard.';
 <html lang="fr">
 
 <head>
-    <meta charset="UTF-8">    <meta name="viewport" content="width=device-width, initial-sc
-ale=1.0">
+    <meta charset="UTF-8">    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Inscription | Mon compte</title>
 
@@ -305,8 +292,7 @@ ale=1.0">
     <p class="description">
         Choisissez votre identifiant et créez votre compte.
     </p>
-    <?php if (isset($_GET['succes']) && $_GET['succes'] === '1'):
- ?>
+    <?php if (isset($_GET['succes']) && $_GET['succes'] === '1'): ?>
 
         <div class="succes" role="status">
             <strong>Inscription réussie !</strong>
@@ -384,8 +370,7 @@ ale=1.0">
                     required
                 >
 
-                <small class="aide">                    Au moins 12 caractères, sans dépasser 72 octe
-ts.
+                <small class="aide">                    Au moins 12 caractères, sans dépasser 72 octets.
                 </small>
             </div>
 
