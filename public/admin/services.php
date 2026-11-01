@@ -431,7 +431,6 @@ eurs.
                         id="slug"
                         name="slug"
                         maxlength="100"
-                        pattern="[a-z0-9]+(-[a-z0-9]+)*"
                         placeholder="mon-service"
                         required
                     >
