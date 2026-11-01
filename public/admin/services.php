@@ -37,11 +37,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         try {
             if ($action === 'creer') {
-                $nom = trim((string) ($_POST['nom'] ?? ''));
-                $slug = trim((string) ($_POST['slug'] ?? ''));
-                $description = trim(
-                    (string) ($_POST['description'] ?? '')
-                );
+    $nom = trim((string) ($_POST['nom'] ?? ''));
+    $slug = trim((string) ($_POST['slug'] ?? ''));
+    $url = trim((string) ($_POST['url'] ?? ''));
+    $description = trim(
+        (string) ($_POST['description'] ?? '')
+    );
+
 
                 if (
                     $nom === ''
@@ -49,6 +51,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     || !slugServiceValide($slug)
                     || mb_strlen($slug) > 100
                     || mb_strlen($description) > 255
+                    || $url === ''
+|| mb_strlen($url) > 255
+|| !urlServiceValide($url)
+
                 ) {
                     throw new InvalidArgumentException(                        'Vérifie le nom, le slug et la description.'
                     );
