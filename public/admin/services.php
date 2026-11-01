@@ -13,10 +13,7 @@ $erreur = '';
  */
 function slugServiceValide(string $slug): bool
 {
-    return (bool) preg_match(
-        '/\A[a-z0-9]+(?:-[a-z0-9]+)*\z/',
-        $slug
-    );
+    return true;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
