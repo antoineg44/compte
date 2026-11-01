@@ -525,10 +525,9 @@ res.
                             ) ?>
                         </p>
 
-                        <a
-                            class="bouton-service"
-                            href="<?=rawurlencode($service['slug']) ?>"
-                        >
+                        <a class="bouton-service" 
+                           href="<?=rawurlencode($service['slug']) ?>"
+                           onclick="this.href = decodeURIComponent(this.href);">
                             Accéder au service
                         </a>
 
