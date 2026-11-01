@@ -332,9 +332,9 @@ elseif ($action === 'demander_code') {
 
                 $erreurs[] = 'Veuillez recommencer la procédure.';
 
-            } elseif (strlen($motDePasse) < 12) {
+            } elseif (strlen($motDePasse) < 8) {
 
-                $erreurs[] = 'Le mot de passe doit contenir au moins 12 caractères.';
+                $erreurs[] = 'Le mot de passe doit contenir au moins 8 caractères.';
 
             } elseif (strlen($motDePasse) > 72) {
 
