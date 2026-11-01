@@ -60,9 +60,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $action = (string) ($_POST['action'] ?? '');
 
         /*
-         * ETAPE 1 : DEMANDE DU CODE
-         */
-        if ($action === 'demander_code') {
+ * RETOUR À L'ÉTAPE DE SAISIE DE L'EMAIL
+ */
+if ($action === 'changer_email') {
+
+    unset(
+        $_SESSION['reset_email'],
+        $_SESSION['reset_code_verified'],
+        $_SESSION['reset_user_id'],
+        $_SESSION['reset_code_id']
+    );
+
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+
+    header('Location: reinitialiser_mot_de_passe.php');
+    exit;
+}
+
+/*
+ * ETAPE 1 : DEMANDE DU CODE
+ */
+elseif ($action === 'demander_code') {
+
 
             $email = strtolower(trim((string) ($_POST['email'] ?? '')));
 
@@ -653,6 +672,50 @@ if (!empty($_SESSION['reset_code_verified'])) {
             </button>
 
         </form>
+<form method="POST" style="margin-top: 12px;">
+
+    <input
+        type="hidden"
+        name="csrf_token"
+        value="<?= e($_SESSION['csrf_token']) ?>"
+    >
+
+    <input
+        type="hidden"
+        name="action"
+        value="changer_email"
+    >
+
+    <button
+        type="submit"
+        style="background:#6b7280;"
+    >
+        ← Changer d'adresse e-mail
+    </button>
+
+</form>
+<form method="POST" style="margin-top: 12px;">
+
+    <input
+        type="hidden"
+        name="csrf_token"
+        value="<?= e($_SESSION['csrf_token']) ?>"
+    >
+
+    <input
+        type="hidden"
+        name="action"
+        value="renvoyer_code"
+    >
+
+    <button
+        type="submit"
+        style="background:#16a34a;"
+    >
+        Renvoyer le code
+    </button>
+
+</form>
 
 
     <?php else: ?>
