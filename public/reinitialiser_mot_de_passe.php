@@ -671,14 +671,14 @@ if (!empty($_SESSION['reset_code_verified'])) {
                     type="password"
                     id="mot_de_passe"
                     name="mot_de_passe"
-                    minlength="12"
+                    minlength="8"
                     autocomplete="new-password"
                     required
                     autofocus
                 >
 
                 <small class="aide">
-                    Au moins 12 caractères, maximum 72 octets.
+                    Au moins 8 caractères, maximum 72 octets.
                 </small>
             </div>
 
