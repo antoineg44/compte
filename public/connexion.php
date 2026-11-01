@@ -376,6 +376,14 @@ ale=1.0">
 
     <div class="logo" aria-hidden="true">C</div>
 
+    <?php if (isset($_GET['mot_de_passe_modifie'])): ?>
+        <div class="succes" role="status">
+            Votre mot de passe a été modifié avec succès.
+            Vous pouvez maintenant vous connecter.
+        </div>
+    <?php endif; ?>
+
+
     <h1>Bienvenue</h1>
 
     <p class="description">
@@ -435,6 +443,12 @@ ale=1.0">
         Vous n'avez pas encore de compte ?
         <a href="inscription.php">Créer un compte</a>
     </div>
+    <div class="pied">
+        <a href="reinitialiser_mot_de_passe.php">
+            Mot de passe oublié ?
+        </a>
+    </div>
+
 
 </main>
 
