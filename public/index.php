@@ -527,7 +527,7 @@ res.
 
                         <a
                             class="bouton-service"
-                            href="service.php?slug=<?= rawurlencode($service['slug']) ?>"
+                            href="<?=rawurlencode($service['slug']) ?>"
                         >
                             Accéder au service
                         </a>
