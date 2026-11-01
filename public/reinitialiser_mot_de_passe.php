@@ -17,11 +17,6 @@ session_start();
 require_once dirname(__DIR__) . '/config/database.php';
 require_once dirname(__DIR__) . '/config/mail.php';
 
-if (isset($_SESSION['utilisateur_id'])) {
-    header('Location: index.php');
-    exit;
-}
-
 // Protection CSRF
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
