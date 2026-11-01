@@ -11,6 +11,7 @@ session_set_cookie_params([
     'secure' => $isHttps,
     'httponly' => true,
     'samesite' => 'Lax',
+    'domain' => '.partitions.ovh',
 ]);
 
 session_start();
