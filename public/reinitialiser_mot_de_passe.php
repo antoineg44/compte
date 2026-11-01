@@ -164,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <p>Ce code est valable pendant 10 minutes.</p>
 
                                     <p>
-                                        Si vous n'êtes pas à l'origine de cette demande,
+                                        Si vous n\'êtes pas à l\'origine de cette demande,
                                         ignorez cet e-mail.
                                     </p>
                                 </div>
