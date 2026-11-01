@@ -752,7 +752,7 @@ if (!empty($_SESSION['reset_code_verified'])) {
                     type="password"
                     id="confirmation"
                     name="confirmation"
-                    minlength="12"
+                    minlength="8"
                     autocomplete="new-password"
                     required
                 >
