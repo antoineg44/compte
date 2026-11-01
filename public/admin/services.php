@@ -550,6 +550,7 @@ eurs.
                                         <input
                                             class="champ-table"
                                             name="slug"
+                                            value="<?= e($service['slug']) ?>"
                                             maxlength="100"
                                             required
                                         >
