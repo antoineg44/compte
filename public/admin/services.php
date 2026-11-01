@@ -1,4 +1,3 @@
-Change ce code et redonne moi le code complet avec l'intégration de ce nouveau champ :
 <?php
 
 declare(strict_types=1);
