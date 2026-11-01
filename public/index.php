@@ -106,6 +106,7 @@ try {
             s.id,
             s.nom,
             s.slug,
+            s.url,
             s.description
          FROM services s
          INNER JOIN acces_utilisateur_services a
@@ -527,7 +528,7 @@ res.
 
                         <a class="bouton-service"
                            href="#"
-                           onclick="window.location.href = decodeURIComponent('<?=rawurlencode($service['slug']) ?>'); return false;">
+                           onclick="window.location.href = decodeURIComponent('<?=rawurlencode($service['url']) ?>'); return false;">
                             Accéder au service
                         </a>
 
