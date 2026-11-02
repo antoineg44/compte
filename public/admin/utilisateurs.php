@@ -631,7 +631,7 @@ ale=1.0">
     <nav class="navigation">
         <a href="index.php">Tableau de bord</a>
         <a href="utilisateurs.php">Utilisateurs</a>
-        <a href="../espace.php">Mon espace</a>
+        <a href="../index.php">Mon espace</a>
     </nav>
 </header>
 
