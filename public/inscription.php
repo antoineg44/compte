@@ -14,6 +14,7 @@ session_set_cookie_params([
 session_start();
 
 require_once dirname(__DIR__) . '/config/database.php';
+require_once dirname(__DIR__) . '/config/mail.php';
 
 if (isset($_SESSION['utilisateur_id'])) {
     header('Location: index.php');
@@ -100,16 +101,96 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 );
 
                 $requete->execute([
-                    'identifiant' => $identifiant,
-                    'email' => $email,
-                    'mot_de_passe' => $hachage,
-                ]);
+    'identifiant' => $identifiant,
+    'email' => $email,
+    'mot_de_passe' => $hachage,
+]);
 
-                // Redirection après inscription                
-                $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+// Envoyer une notification par e-mail à l'administrateur
+$destinataire = 'antoine.godet@outlook.fr';
 
-                header('Location: inscription.php?succes=1');
-                exit;
+$sujet = 'Nouvelle inscription sur votre site';
+
+$dateInscription = date('d/m/Y à H:i:s');
+
+$contenu = '
+<div style="
+    font-family: Arial, sans-serif;
+    max-width: 550px;
+    margin: auto;
+    padding: 25px;
+    background: #f3f5f9;
+    border-radius: 12px;
+">
+
+    <div style="
+        padding: 25px;
+        background: white;
+        border-radius: 10px;
+    ">
+
+        <h2 style="color: #315bea;">
+            Nouvelle inscription !
+        </h2>
+
+        <p>
+            Un nouvel utilisateur vient de créer un compte sur votre site.
+        </p>
+
+        <hr style="border: 0; border-top: 1px solid #e5e7eb;">
+
+        <p>
+            <strong>Identifiant :</strong><br>
+            ' . e($identifiant) . '
+        </p>
+
+        <p>
+            <strong>Adresse e-mail :</strong><br>
+            ' . e($email) . '
+        </p>
+
+        <p>
+            <strong>Date d\'inscription :</strong><br>
+            ' . e($dateInscription) . '
+        </p>
+
+        <hr style="border: 0; border-top: 1px solid #e5e7eb;">
+
+        <p style="color: #6b7280; font-size: 12px;">
+            Ceci est un message automatique envoyé lors de la création
+            d\'un nouveau compte.
+        </p>
+
+    </div>
+
+</div>
+';
+
+// Envoyer le mail sans empêcher l'inscription en cas d'échec
+try {
+
+    if (!envoyerMail($destinataire, $sujet, $contenu)) {
+
+        error_log(
+            'Impossible d\'envoyer la notification de nouvelle inscription.'
+        );
+
+    }
+
+} catch (Throwable $e) {
+
+    error_log(
+        'Erreur notification nouvelle inscription : ' . $e->getMessage()
+    );
+
+}
+
+// Redirection après inscription
+$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+
+header('Location: inscription.php?succes=1');
+exit;
+
             }
         } catch (PDOException $e) {            // 23000 correspond notamment à une violation de contrainte UNIQUE.
             if ($e->getCode() === '23000') {                $erreurs[] = 'Cet identifiant ou cette adresse e-mail est déjà utilisé.';
