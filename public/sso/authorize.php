@@ -29,6 +29,11 @@ const SSO_CLIENTS = [
         'service' => 'music',
         'label' => 'musique',
     ],
+    'partitions' => [
+        'redirect_uri' => 'https://app.partitions.ovh/sso/callback.php',
+        'service' => 'partitions',
+        'label' => 'partitions',
+    ],
 ];
 
 function ssoErreur(int $code, string $message): never
