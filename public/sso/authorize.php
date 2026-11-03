@@ -34,6 +34,11 @@ const SSO_CLIENTS = [
         'service' => 'partitions',
         'label' => 'partitions',
     ],
+    'photo' => [
+        'redirect_uri' => 'https://photo.partitions.ovh/sso/callback.php',
+        'service' => 'photo',
+        'label' => 'photo',
+    ],
 ];
 
 function ssoErreur(int $code, string $message): never
