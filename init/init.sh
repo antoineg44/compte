@@ -132,13 +132,22 @@ cat > "$DEPLOY_WORKER" <<EOF
 set -Eeuo pipefail
 
 status=0
-output=\$(/usr/bin/timeout 90 /usr/bin/flock -n -E 75 "\$HOME/.deploy.lock" '$DEPLOY_HELPER' </dev/null 2>&1) || status=\$?
-if [[ \$status -eq 75 ]]; then
+
+output=$(
+    /usr/bin/timeout 90 \
+    /usr/bin/flock -n -E 75 "$HOME/.deploy.lock" \
+    /usr/local/sbin/deploy-compte </dev/null 2>&1
+) || status=$?
+
+if [[ $status -eq 75 ]]; then
     output="Un deploiement est deja en cours."
-elif [[ \$status -eq 124 ]]; then
-    output="Delai de deploiement depasse (90 secondes). \$output"
+elif [[ $status -eq 124 ]]; then
+    output="Delai de deploiement depasse (90 secondes). $output"
 fi
-printf '%s\n%s\n' "\$status" "\$output"
+
+printf '%s\n%s\n' "$status" "$output"
+
+exit "$status"
 EOF
 
 chown root:root "$DEPLOY_WORKER"
