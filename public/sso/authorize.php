@@ -91,12 +91,62 @@ if (
     ssoErreur(400, 'Paramètres SSO invalides.');
 }
 
-if (!isset($_SESSION['utilisateur_id'])) {
-    $_SESSION['sso_pending'] = $parametres;
+$utilisateurId = null;
 
-    header('Location: /connexion.php');
-    exit;
+$accesParLien = isset($_GET['access_key']);
+
+if ($accesParLien) {
+
+    $cle = (string) $_GET['access_key'];
+
+    if (!preg_match('/\A[A-Za-z0-9_-]{43}\z/', $cle)) {
+        ssoErreur(403, 'Lien d'accès invalide.');
+    }
+
+    try {
+        $requete = $pdo->prepare(
+            'SELECT utilisateur_id
+             FROM sso_liens
+             WHERE cle_hash = :cle_hash
+               AND service = :service
+               AND actif = 1
+               AND (
+                   date_expiration IS NULL
+                   OR date_expiration > NOW()
+               )
+             LIMIT 1'
+        );
+
+        $requete->execute([
+            'cle_hash' => hash('sha256', $cle),
+            'service' => $client['service'],
+        ]);
+
+        $lien = $requete->fetch();
+
+        if (!$lien) {
+            ssoErreur(403, 'Lien invalide, désactivé ou expiré.');
+        }
+
+        $utilisateurId = (int) $lien['utilisateur_id'];
+
+    } catch (Throwable $e) {
+        error_log('Erreur SSO lien : ' . $e->getMessage());
+        ssoErreur(500, 'Erreur technique.');
+    }
+
+} else {
+
+    if (!isset($_SESSION['utilisateur_id'])) {
+        $_SESSION['sso_pending'] = $parametres;
+
+        header('Location: /connexion.php');
+        exit;
+    }
+
+    $utilisateurId = (int) $_SESSION['$utilisateurId'];
 }
+
 
 try {
     $requete = $pdo->prepare(
@@ -107,7 +157,7 @@ try {
     );
 
     $requete->execute([
-        'id' => (int) $_SESSION['utilisateur_id'],
+        'id' => (int) $_SESSION['$utilisateurId'],
     ]);
 
     if (!$requete->fetch()) {
@@ -119,7 +169,7 @@ try {
     if (
         !utilisateurAAccesService(
             $pdo,
-            (int) $_SESSION['utilisateur_id'],
+            (int) $_SESSION['$utilisateurId'],
             $client['service']
         )
     ) {
@@ -141,7 +191,7 @@ try {
 
     $requete->execute([
         'code_hash' => $codeHash,
-        'utilisateur_id' => (int) $_SESSION['utilisateur_id'],
+        'utilisateur_id' => (int) $_SESSION['$utilisateurId'],
         'client_id' => $parametres['client_id'],
         'code_challenge' => $parametres['code_challenge'],
     ]);
