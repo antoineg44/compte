@@ -747,6 +747,14 @@ ale=1.0">
                                         Modifier
                                     </a>
 
+                                    <a
+    class="bouton"
+    href="liens-sso.php?id=<?= (int) $utilisateur['id'] ?>"
+>
+    🔑 Liens SSO
+</a>
+
+
                                     <?php if (
                                         (int) $utilisateur['id'] !== (int) $_SESSION['utilisateur_id']): ?>
 
