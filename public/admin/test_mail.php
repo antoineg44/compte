@@ -3,7 +3,7 @@
 declare(strict_types=1); // ============================================= // CONFIGURATION // ============================================= 
 // Adresse qui recevra le mail de test. 
 $destinataire = 'antoine.godet@outlook.fr'; // Protection : à modifier avec une clé personnelle. 
-$cleAcces = 'CHANGE_MOI_AVEC_UNE_CLE_SECRETE_LONGUE';
+$cleAcces = 'M8pK92xT4vN7qR5wL3zB6cF1:';
 // ============================================= // INITIALISATION // ============================================= 
 $isHttps = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
 session_set_cookie_params(['lifetime' => 0, 'path' => '/', 'secure' => $isHttps, 'httponly' => true, 'samesite' => 'Strict',]);
