@@ -54,7 +54,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $fonctionExiste && !empty($_SESSION
         $date = date('d/m/Y à H:i:s');
         $contenu = ' <div style="font-family:Arial;padding:25px;background:#f3f5f9;"> <div style="background:white;padding:25px;border-radius:12px;"> <h2 style="color:#315bea;"> Test d\'envoi réussi ! </h2> <p> Ce message confirme que votre système d\'envoi d\'e-mails fonctionne. </p> <p> <strong>Date du test :</strong> ' . e($date) . ' </p> <p> <strong>Serveur :</strong> ' . e((string) ($_SERVER['HTTP_HOST'] ?? 'Inconnu')) . ' </p> <hr> <p style="color:#6b7280;font-size:12px;"> Message automatique de diagnostic. </p> </div> </div> ';
         try {
-            $resultat = envoyerMail($adresse, $sujet, $contenu);
+            $resultat = envoyerMail(
+    $adresse,
+    $sujet,
+    $contenu
+);
+
+// Récupérer le diagnostic détaillé
+$detailsMail = obtenirDiagnosticMail();
+
+$envoiEffectue = true;
+
+diagnostic(
+    'Envoi du mail',
+    $resultat === true,
+    $resultat
+        ? 'Le serveur SMTP a accepté le message.'
+        : 'Échec de l envoi.'
+);
+
+// Afficher les informations SMTP
+diagnostic(
+    'Serveur SMTP',
+    true,
+    $detailsMail['serveur']
+);
+
+diagnostic(
+    'Port SMTP',
+    true,
+    (string) $detailsMail['port']
+);
+
+diagnostic(
+    'Sécurité SMTP',
+    true,
+    $detailsMail['securite']
+);
+
+diagnostic(
+    'Authentification SMTP',
+    $detailsMail['mot_de_passe_configure'],
+    $detailsMail['mot_de_passe_configure']
+        ? 'Mot de passe configuré.'
+        : 'Mot de passe absent.'
+);
+
+if (!$resultat) {
+
+    diagnostic(
+        'Détail de l erreur SMTP',
+        false,
+        $detailsMail['erreur'] ?? 'Erreur inconnue.'
+    );
+
+}
+
             $envoiEffectue = true;
             diagnostic('Envoi du mail', $resultat === true, $resultat === true ? 'La fonction envoyerMail() a confirmé l\'envoi.' : 'La fonction envoyerMail() a retourné FALSE.');
         } catch (Throwable $e) {
@@ -280,6 +335,33 @@ if (empty($_SESSION['csrf_token'])) {
 
 
         </div>
+        <?php if (!$resultat && !empty($detailsMail['erreur'])): ?>
+
+    <div style="
+        margin-top:20px;
+        padding:18px;
+        background:#fef2f2;
+        border:1px solid #fecaca;
+        border-radius:10px;
+        color:#991b1b;
+    ">
+
+        <h3>Diagnostic détaillé</h3>
+
+        <p>
+            <strong>Erreur rencontrée :</strong>
+        </p>
+
+        <pre style="
+            white-space:pre-wrap;
+            overflow-wrap:anywhere;
+            font-size:13px;
+        "><?= e($detailsMail['erreur']) ?></pre>
+
+    </div>
+
+<?php endif; ?>
+
 
     </main>
 
