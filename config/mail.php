@@ -5,6 +5,15 @@ use PHPMailer\PHPMailer\Exception;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+// Stockage du dernier diagnostic
+$GLOBALS['dernierDiagnosticMail'] = [];
+
+// Récupération du diagnostic
+function obtenirDiagnosticMail(): array
+{
+    return $GLOBALS['dernierDiagnosticMail'];
+}
+
 /**
  * Envoie un email via le SMTP OVH.
  *
@@ -24,6 +33,16 @@ function envoyerMail(
 
     $mail = new PHPMailer(true);
 
+    $diagnostic = [
+    'succes' => false,
+    'erreur' => null,
+    'serveur' => 'ssl0.ovh.net',
+    'port' => 587,
+    'securite' => 'STARTTLS',
+    'mot_de_passe_configure' => false,
+];
+
+
     try {
 
         // Configuration SMTP OVH
@@ -32,6 +51,14 @@ function envoyerMail(
         $mail->SMTPAuth   = true;
         $mail->Username   = 'contact@partitions.ovh';
         $mail->Password   = getenv('OVH_MAIL_PASSWORD');
+        if (empty($mail->Password)) {
+    throw new RuntimeException(
+        'La variable OVH_MAIL_PASSWORD est absente ou vide.'
+    );
+}
+
+$diagnostic['mot_de_passe_configure'] = true;
+
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = 587;
 
@@ -51,12 +78,29 @@ function envoyerMail(
         $mail->AltBody = strip_tags($message);
 
         // Envoi
-        return $mail->send();
+        $mail->send();
 
-    } catch (Exception $e) {
+$diagnostic['succes'] = true;
 
-        error_log('Erreur envoi email : ' . $mail->ErrorInfo);
+$GLOBALS['dernierDiagnosticMail'] = $diagnostic;
 
-        return false;
-    }
+return true;
+
+} catch (Throwable $e) {
+
+    $diagnostic['erreur'] = (
+        $mail->ErrorInfo !== ''
+        ? $mail->ErrorInfo
+        : $e->getMessage()
+    );
+
+    $GLOBALS['dernierDiagnosticMail'] = $diagnostic;
+
+    error_log(
+        'Erreur envoi email : ' . $diagnostic['erreur']
+    );
+
+    return false;
+}
+
 }
