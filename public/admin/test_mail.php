@@ -29,7 +29,7 @@ if (!hash_equals($cleAcces, (string) ($_GET['cle'] ?? ''))) {
 // 1. Vérification PHP 
 diagnostic('Version PHP', PHP_VERSION_ID >= 80200, 'Version détectée : ' . PHP_VERSION);
 // 2. Vérification de la configuration mail 
-$fichierMail = dirname(__DIR__) . '/config/mail.php';
+$fichierMail = dirname(__DIR__) . '/../config/mail.php';
 diagnostic('Fichier de configuration mail', file_exists($fichierMail), $fichierMail);
 if (file_exists($fichierMail)) {
     try {
