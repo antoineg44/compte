@@ -946,7 +946,7 @@ function libelleActivite(string $action): string
                 </div>
 
             </a>
-            <a class="raccourci" href="test_mail.php">
+            <a class="raccourci" href="test_mail.php?cle=M8pK92xT4vN7qR5wL3zB6cF1:">
                 <div class="raccourci-titre">
                     Diagnostic des e-mails
                 </div>
