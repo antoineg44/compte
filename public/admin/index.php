@@ -946,6 +946,15 @@ function libelleActivite(string $action): string
                 </div>
 
             </a>
+            <a class="raccourci" href="test_mail.php">
+                <div class="raccourci-titre">
+                    Diagnostic des e-mails
+                </div>
+                
+                <div class="raccourci-description">
+                    Tester l'envoi des e-mails et vérifier la configuration SMTP du serveur.
+                </div>
+            </a>
 
         </div>
 
