@@ -8,21 +8,17 @@ require_once dirname(__DIR__) . '/vendor/autoload.php';
 // Stockage du dernier diagnostic
 $GLOBALS['dernierDiagnosticMail'] = [];
 
-// Récupération du diagnostic
+/**
+ * Récupère le dernier diagnostic d'envoi.
+ */
 function obtenirDiagnosticMail(): array
 {
     return $GLOBALS['dernierDiagnosticMail'];
 }
 
 /**
- * Envoie un email via le SMTP OVH.
- *
- * @param string $destinataire Adresse email du destinataire
- * @param string $sujet        Sujet du message
- * @param string $message      Contenu HTML du message
- * @param string|null $nom     Nom du destinataire
- *
- * @return bool
+ * Envoie un email via Postfix local.
+ * Postfix transmet le message à OpenDKIM pour signature.
  */
 function envoyerMail(
     string $destinataire,
@@ -34,73 +30,76 @@ function envoyerMail(
     $mail = new PHPMailer(true);
 
     $diagnostic = [
-    'succes' => false,
-    'erreur' => null,
-    'serveur' => 'ssl0.ovh.net',
-    'port' => 587,
-    'securite' => 'STARTTLS',
-    'mot_de_passe_configure' => false,
-];
-
+        'succes' => false,
+        'erreur' => null,
+        'serveur' => '127.0.0.1',
+        'port' => 25,
+        'securite' => 'Connexion locale',
+        'mot_de_passe_configure' => false,
+        'methode' => 'Postfix + OpenDKIM'
+    ];
 
     try {
 
-        // Configuration SMTP OVH
+        // Connexion à Postfix sur le VPS
         $mail->isSMTP();
-        $mail->Host       = 'ssl0.ovh.net';
-        $mail->SMTPAuth   = true;
-        $mail->Username   = 'contact@partitions.ovh';
-        $mail->Password   = getenv('OVH_MAIL_PASSWORD');
-        if (empty($mail->Password)) {
-    throw new RuntimeException(
-        'La variable OVH_MAIL_PASSWORD est absente ou vide.'
-    );
-}
+        $mail->Host = '127.0.0.1';
+        $mail->Port = 25;
 
-$diagnostic['mot_de_passe_configure'] = true;
+        // Pas d'authentification sur la connexion locale
+        $mail->SMTPAuth = false;
 
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = 587;
+        // Pas de TLS nécessaire sur le loopback
+        $mail->SMTPSecure = '';
+        $mail->SMTPAutoTLS = false;
+
+        $mail->Timeout = 15;
 
         // Encodage
         $mail->CharSet = 'UTF-8';
+        $mail->Encoding = 'base64';
 
         // Expéditeur
-        $mail->setFrom('contact@partitions.ovh', 'Partitions');
+        $mail->setFrom(
+            'contact@partitions.ovh',
+            'Partitions'
+        );
 
         // Destinataire
-        $mail->addAddress($destinataire, $nom ?? '');
+        $mail->addAddress(
+            $destinataire,
+            $nom ?? ''
+        );
 
         // Contenu
         $mail->isHTML(true);
         $mail->Subject = $sujet;
-        $mail->Body    = $message;
+        $mail->Body = $message;
         $mail->AltBody = strip_tags($message);
 
-        // Envoi
+        // Envoi via Postfix
         $mail->send();
 
-$diagnostic['succes'] = true;
+        $diagnostic['succes'] = true;
 
-$GLOBALS['dernierDiagnosticMail'] = $diagnostic;
+        $GLOBALS['dernierDiagnosticMail'] = $diagnostic;
 
-return true;
+        return true;
 
-} catch (Throwable $e) {
+    } catch (Throwable $e) {
 
-    $diagnostic['erreur'] = (
-        $mail->ErrorInfo !== ''
-        ? $mail->ErrorInfo
-        : $e->getMessage()
-    );
+        $diagnostic['erreur'] = (
+            $mail->ErrorInfo !== ''
+                ? $mail->ErrorInfo
+                : $e->getMessage()
+        );
 
-    $GLOBALS['dernierDiagnosticMail'] = $diagnostic;
+        $GLOBALS['dernierDiagnosticMail'] = $diagnostic;
 
-    error_log(
-        'Erreur envoi email : ' . $diagnostic['erreur']
-    );
+        error_log(
+            'Erreur envoi email : ' . $diagnostic['erreur']
+        );
 
-    return false;
-}
-
+        return false;
+    }
 }
