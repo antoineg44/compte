@@ -6,7 +6,12 @@ session_set_cookie_params(['lifetime' => 0, 'path' => '/', 'secure' => $isHttps,
 session_start();
 require_once dirname(__DIR__, 2) . '/config/database.php';
 require_once dirname(__DIR__, 2) . '/config/services.php';
-const SSO_CLIENTS = ['video' => ['redirect_uri' => 'https://video.partitions.ovh/sso/callback.php', 'service' => 'video', 'label' => 'vidéo',], 'music' => ['redirect_uri' => 'https://musiques.partitions.ovh/php/sso/callback.php', 'service' => 'music', 'label' => 'musique',], 'partitions' => ['redirect_uri' => 'https://app.partitions.ovh/sso/callback.php', 'service' => 'partitions', 'label' => 'partitions',], 'photo' => ['redirect_uri' => 'https://photo.partitions.ovh/sso/callback.php', 'service' => 'photo', 'label' => 'photo',],];
+const SSO_CLIENTS = [
+  'video' => ['redirect_uri' => 'https://video.partitions.ovh/sso/callback.php', 'service' => 'video', 'label' => 'vidéo',], 
+  'music' => ['redirect_uri' => 'https://musiques.partitions.ovh/php/sso/callback.php', 'service' => 'music', 'label' => 'musique',], 
+  'partitions' => ['redirect_uri' => 'https://app.partitions.ovh/sso/callback.php', 'service' => 'partitions', 'label' => 'partitions',], 
+  'editeur' => ['redirect_uri' => 'https://editeur.partitions.ovh/sso/callback.php', 'service' => 'editeur', 'label' => 'editeur',], 
+  'photo' => ['redirect_uri' => 'https://photo.partitions.ovh/sso/callback.php', 'service' => 'photo', 'label' => 'photo',],];
 function ssoErreur(int $code, string $message): never
 {
   http_response_code($code);
